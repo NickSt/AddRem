@@ -77,11 +77,15 @@ per-clone. The hook runs the same four commands as step 4.
 - **Parsing is pure.** Anything that parses a registry value, a version, a date,
   an icon reference or an uninstall command is a `static bool TryParse` with no
   I/O, so it can be unit-tested from a table.
-- **All registry access goes through `IRegistryRoot` / `IRegistryKey`.** Never
-  call `Microsoft.Win32.Registry` outside `WindowsRegistryRoot`. This is the
+- **All registry access goes through `IRegistryRoot` / `IRegistryKey`.** Only
+  `WindowsRegistryRoot` and `WindowsRegistryKey` may touch `RegistryKey`; the
+  `RegistryHive` / `RegistryView` / `RegistryValueKind` enums are fine anywhere,
+  since the seam is deliberately expressed in those terms. This is the
   testability seam; breaking it breaks the test suite's premise, and a guard
-  test in `AddRem.Tests` enforces it by reflection.
-- Always dispose registry keys. Enumeration must not leak handles.
+  test in `AddRem.Tests` enforces it by reflection (M4).
+- Always dispose registry keys. Enumeration must not leak handles, and
+  `WindowsRegistryKey.LiveInstances` exists so integration tests can prove it.
+  The original code leaked one handle per installed program per call.
 - **Never throw on a missing or malformed registry value** — degrade to `null`
   and keep going. One bad vendor entry must not break enumeration. (Real data
   has `EstimatedSize` as a string, `InstallDate` as a Unix epoch, and
