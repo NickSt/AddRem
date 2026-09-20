@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# AddRem pre-push hook.
+#
+# Enable it once per clone with:
+#     git config core.hooksPath .githooks
+#
+# It mirrors CI: format check, strict build, unit tests. `git push --no-verify`
+# bypasses it, but CI is the real gate and will fail the same way.
+
+set -e
+
+echo "pre-push: restoring local tools..."
+dotnet tool restore
+
+echo "pre-push: checking formatting (csharpier)..."
+dotnet csharpier check .
+
+echo "pre-push: building (warnings are errors)..."
+dotnet build AddRem.slnx -c Release -warnaserror
+
+echo "pre-push: running unit tests..."
+dotnet test tests/AddRem.Tests/AddRem.Tests.csproj -c Release --no-build
+
+echo "pre-push: OK"

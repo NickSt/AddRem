@@ -8,7 +8,7 @@ public static class AppManager
     {
         var result = ProcessAppsFromKey(RegKeys.UNINSTALL_KEY);
 
-        if(Environment.Is64BitProcess)
+        if (Environment.Is64BitProcess)
             result.AddRange(ProcessAppsFromKey(RegKeys.UNINSTALL_KEY_6432));
 
         return result;
@@ -16,14 +16,9 @@ public static class AppManager
 
     private static List<App> ProcessAppsFromKey(string key)
     {
-        using var regkey = Registry
-            .LocalMachine
-            .OpenSubKey(key)
-            ?? throw new Exception();
+        using var regkey = Registry.LocalMachine.OpenSubKey(key) ?? throw new Exception();
 
-        var subkeys = regkey.GetSubKeyNames()
-            .Select(k => regkey.OpenSubKey(k))
-            .ToList();
+        var subkeys = regkey.GetSubKeyNames().Select(k => regkey.OpenSubKey(k)).ToList();
 
         List<App> InstalledApps = [];
         foreach (var subkey in subkeys)

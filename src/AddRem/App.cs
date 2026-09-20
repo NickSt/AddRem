@@ -3,7 +3,7 @@
 namespace AddRem;
 
 /// <summary>
-/// This object represents an installed application. 
+/// This object represents an installed application.
 /// Any field that directly correlates to a registry value is marked with [Registry Value] in its comment.
 /// </summary>
 public class App
@@ -11,7 +11,7 @@ public class App
     #region Registry Fields
     /// <summary>
     /// [Registry Value]
-    /// This the name of the containing registry key 
+    /// This the name of the containing registry key
     /// It is usually a GUID but it can be an application name
     /// </summary>
     public string? Name { get; set; }
@@ -50,8 +50,8 @@ public class App
     /// [Registry Value]
     /// Similar to above, it is seldom used
     /// </summary>
-    public string? HelpTelephone {  get; set; }
-    
+    public string? HelpTelephone { get; set; }
+
     /// <summary>
     /// [Registry Value]
     /// This is the install date shown in add or remove programs
@@ -88,7 +88,7 @@ public class App
     /// <summary>
     /// [Registry Value]
     /// </summary>
-    public bool SystemComponent {  get; set; }
+    public bool SystemComponent { get; set; }
 
     /// <summary>
     /// [Registry Value]
@@ -127,10 +127,12 @@ public class App
         Size = (int)(key.GetValue(nameof(Size)) ?? 0);
     }
 
-    private static string GetShortName(string regPath) => regPath[(regPath.LastIndexOf('\\') + 1)..];
+    private static string GetShortName(string regPath) =>
+        regPath[(regPath.LastIndexOf('\\') + 1)..];
+
     private static bool DWordIntToBool(object? key)
     {
-        if(key is null)
+        if (key is null)
             return false;
 
         var tempVal = (int)key;

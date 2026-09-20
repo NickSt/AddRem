@@ -1,0 +1,6 @@
+**/bin/
+**/obj/
+**/artifacts/
+**/*.Designer.cs
+**/*.g.cs
+tests/**/Fixtures/

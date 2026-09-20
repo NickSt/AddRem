@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  build-test:
+    # This exact name is what branch protection requires as a status check.
+    name: Build & Test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # global-json-file is load-bearing, not cosmetic: the windows-latest image
+      # currently ships SDK 10.0.201, which needs MSBuild 18 while the image has
+      # 17, so builds fail without pinning back to the 10.0.1xx band.
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      # Runs before the build so a formatting-only failure is fast and unambiguous.
+      - name: Check formatting
+        run: dotnet csharpier check .
+
+      - name: Restore
+        run: dotnet restore AddRem.slnx
+
+      - name: Build
+        run: dotnet build AddRem.slnx -c Release --no-restore -warnaserror
+
+      # M1 moves this to xunit.v3 on Microsoft.Testing.Platform, where the args
+      # become: -- --report-trx --coverage --coverage-output-format cobertura
+      - name: Unit tests
+        run: >
+          dotnet test tests/AddRem.Tests/AddRem.Tests.csproj
+          -c Release --no-build
+          --logger trx
+          --collect:"XPlat Code Coverage"
+          --results-directory artifacts/test
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: artifacts/test
+          if-no-files-found: warn
