@@ -32,7 +32,7 @@ cd AddRem
 git config core.hooksPath .githooks     # enables the pre-push checks
 dotnet tool restore
 dotnet build AddRem.slnx -c Release
-dotnet test AddRem.slnx -c Release
+dotnet test --solution AddRem.slnx -c Release
 ```
 
 ## Contributing
@@ -44,7 +44,7 @@ Before pushing:
 dotnet tool restore
 dotnet csharpier check .                # `dotnet csharpier format .` to fix
 dotnet build AddRem.slnx -c Release -warnaserror
-dotnet test tests/AddRem.Tests/AddRem.Tests.csproj -c Release
+dotnet test --project tests/AddRem.Tests/AddRem.Tests.csproj -c Release
 ```
 
 The `.githooks/pre-push` hook runs exactly these. See [CLAUDE.md](CLAUDE.md) for

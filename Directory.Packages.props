@@ -5,13 +5,17 @@
   </PropertyGroup>
 
   <!--
-    Test stack. M1 replaces xunit v2 / VSTest with xunit.v3 on the
-    Microsoft Testing Platform; these are the current versions until then.
+    Test stack: xunit.v3 on the Microsoft Testing Platform. MTP (not VSTest) is
+    the path the .NET 10 SDK steers toward, and xunit v3 test projects are
+    executables that host their own runner, hence no Microsoft.NET.Test.Sdk and
+    no xunit.runner.visualstudio.
+
+    Coverage comes from Microsoft.Testing.Extensions.CodeCoverage;
+    coverlet.collector is a VSTest data collector and does not work under MTP.
+    TRX reporting is built into xunit.v3 (see the report switch used in CI).
   -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
-    <PackageVersion Include="xunit" Version="2.9.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="xunit.v3" Version="4.0.1" />
+    <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.11.2" />
   </ItemGroup>
 </Project>

@@ -31,7 +31,7 @@ Ships as NuGet packages (`AddRem`, `AddRem.Msix`) plus a console demo.
    dotnet tool restore
    dotnet csharpier check .
    dotnet build AddRem.slnx -c Release -warnaserror
-   dotnet test tests/AddRem.Tests/AddRem.Tests.csproj -c Release
+   dotnet test --project tests/AddRem.Tests/AddRem.Tests.csproj -c Release
    ```
    If the format check fails, run `dotnet csharpier format .` and re-stage.
 5. **Push and open a PR into `main`.** CI must be green before merge.
@@ -52,15 +52,19 @@ per-clone. The hook runs the same four commands as step 4.
 | Check formatting | `dotnet csharpier check .` |
 | Fix formatting | `dotnet csharpier format .` |
 | Build (strict) | `dotnet build AddRem.slnx -c Release -warnaserror` |
-| Unit tests | `dotnet test tests/AddRem.Tests/AddRem.Tests.csproj -c Release` |
-| Integration tests | `dotnet test tests/AddRem.IntegrationTests/AddRem.IntegrationTests.csproj -c Release` |
-| All tests | `dotnet test AddRem.slnx -c Release` |
+| Unit tests | `dotnet test --project tests/AddRem.Tests/AddRem.Tests.csproj -c Release` |
+| Integration tests | `dotnet test --project tests/AddRem.IntegrationTests/AddRem.IntegrationTests.csproj -c Release` |
+| All tests | `dotnet test --solution AddRem.slnx -c Release` |
 | Run the demo | `dotnet run --project src/AddRem.Demo -- list --all` |
 | Capture a fixture | `dotnet run --project src/AddRem.Demo -- snapshot --redact -o tests/AddRem.Tests/Fixtures/<name>.json` |
 | Pack locally | `dotnet pack src/AddRem -c Release -o artifacts` |
 
 ## Conventions
 
+- **Tests run on the Microsoft Testing Platform**, opted into via `global.json`.
+  `dotnet test` therefore takes `--project` / `--solution` rather than a
+  positional path, and extension options (`--report-xunit-trx`, `--coverage`)
+  are passed directly with no `--` separator. VSTest syntax will not work.
 - **CSharpier owns formatting.** Do not hand-format; do not argue with it.
   `.editorconfig` carries only what CSharpier does not: encoding, naming,
   `var` usage, using placement, analyzer severities.
