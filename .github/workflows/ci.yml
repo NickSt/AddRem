@@ -47,14 +47,15 @@ jobs:
       - name: Build
         run: dotnet build AddRem.slnx -c Release --no-restore -warnaserror
 
-      # M1 moves this to xunit.v3 on Microsoft.Testing.Platform, where the args
-      # become: -- --report-trx --coverage --coverage-output-format cobertura
+      # Microsoft.Testing.Platform (opted into via global.json) takes the project
+      # with --project, and extension options directly - there is no `--`
+      # separator and no positional project path, unlike VSTest.
       - name: Unit tests
         run: >
-          dotnet test tests/AddRem.Tests/AddRem.Tests.csproj
+          dotnet test --project tests/AddRem.Tests/AddRem.Tests.csproj
           -c Release --no-build
-          --logger trx
-          --collect:"XPlat Code Coverage"
+          --report-xunit-trx
+          --coverage --coverage-output-format cobertura
           --results-directory artifacts/test
 
       - uses: actions/upload-artifact@v7
@@ -62,4 +63,33 @@ jobs:
         with:
           name: test-results
           path: artifacts/test
+          if-no-files-found: warn
+
+  integration:
+    # Deliberately reads the real machine. Informational until it has earned
+    # trust; do not add it as a required status check while continue-on-error
+    # is set, because it reports success either way.
+    name: Integration Tests (Windows)
+    runs-on: windows-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Integration tests
+        run: >
+          dotnet test --project tests/AddRem.IntegrationTests/AddRem.IntegrationTests.csproj
+          -c Release
+          --report-xunit-trx
+          --results-directory artifacts/integration
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: integration-results
+          path: artifacts/integration
           if-no-files-found: warn

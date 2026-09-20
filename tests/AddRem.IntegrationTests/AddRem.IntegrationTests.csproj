@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Integration tests. These deliberately read the real machine, so they are a
+    separate project and a separate CI job: excluding them is a matter of which
+    csproj you pass, with no dependence on trait-filter syntax.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AddRem\AddRem.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,32 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- M1 removes this line so the net10.0-windows default in
-         Directory.Build.props takes effect. -->
-    <TargetFramework>net8.0-windows</TargetFramework>
-
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
-
-  <!-- Versions live in Directory.Packages.props (central package management). -->
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+  <!--
+    Unit tests. These must never touch the live registry - every test runs
+    against an in-memory fake so the suite is deterministic on any machine.
+    Live-machine coverage belongs in AddRem.IntegrationTests.
+  -->
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\AddRem\AddRem.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="Xunit" />
   </ItemGroup>
 </Project>
